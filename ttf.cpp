@@ -163,15 +163,14 @@ int main(int argc, char* args[]) {
   //Pause
   while(!quit) {
     while( SDL_PollEvent(&event) ) {
-      //if a key was pressed
-      if(event.type==SDL_KEYDOWN) {
-	switch(event.key.keysym.sym) {
-	case SDLK_UP: message = upMessage; break;
-	case SDLK_DOWN: message = downMessage; break;
-	case SDLK_LEFT: message = leftMessage; break;
-	case SDLK_RIGHT: message = rightMessage; break;
-	}
-      }
+      //get keystates
+      Uint8 *keystates = SDL_GetKeyState(0);
+
+      if ( keystates[SDLK_UP] ) message = upMessage;
+      else if ( keystates[SDLK_DOWN] ) message = downMessage;
+      else if ( keystates[SDLK_LEFT] ) message = leftMessage;
+      else if ( keystates[SDLK_RIGHT] ) message = rightMessage;
+
       //if user quits
       if(event.type==SDL_QUIT) {
 	//quit program
