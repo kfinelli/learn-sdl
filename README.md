@@ -1,1 +1,2 @@
-http://www.lazyfoo.net/SDL_tutorials/
+Moving to the SDL 2.0 tutorial!
+http://lazyfoo.net/tutorials/SDL/index.php
