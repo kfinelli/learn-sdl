@@ -79,40 +79,35 @@ LTexture::~LTexture()
 
 bool LTexture::loadFromFile( std::string path )
 {
-	//Get rid of preexisting texture
-	free();
+  //Get rid of preexisting texture
+  free();
 
-	//Load image at specified path
-	SDL_Surface* loadedSurface = IMG_Load( path.c_str() );
-	if( loadedSurface == NULL )
-	{
-		printf( "Unable to load image %s! SDL_image Error: %s\n", path.c_str(), IMG_GetError() );
-	}
-	else
-	{
-		//Color key image
-		SDL_SetColorKey( loadedSurface, SDL_TRUE, SDL_MapRGB( loadedSurface->format, 0, 0xFF, 0xFF ) );
+  //Load image at specified path
+  std::unique_ptr<SDL_Surface, decltype(&SDL_FreeSurface)>
+    loadedSurface(IMG_Load( path.c_str() ), SDL_FreeSurface);
 
-		//Create texture from surface pixels
-        mTexture.reset(SDL_CreateTextureFromSurface( gRenderer.get(), loadedSurface ));
+  if( loadedSurface == nullptr ) {
+    printf( "Unable to load image %s! SDL_image Error: %s\n", path.c_str(), IMG_GetError() );
+  }
+  else {
+    //Color key image
+    SDL_SetColorKey( loadedSurface.get(), SDL_TRUE, SDL_MapRGB( loadedSurface->format, 0, 0xFF, 0xFF ) );
 
-		if( mTexture == nullptr )
-		{
-			printf( "Unable to create texture from %s! SDL Error: %s\n", path.c_str(), SDL_GetError() );
-		}
-		else
-		{
-			//Get image dimensions
-			mWidth = loadedSurface->w;
-			mHeight = loadedSurface->h;
-		}
+    //Create texture from surface pixels
+    mTexture.reset(SDL_CreateTextureFromSurface( gRenderer.get(), loadedSurface.get() ));
 
-		//Get rid of old loaded surface
-		SDL_FreeSurface( loadedSurface );
-	}
+    if( mTexture == nullptr ) {
+      printf( "Unable to create texture from %s! SDL Error: %s\n", path.c_str(), SDL_GetError() );
+    }
+    else {
+      //Get image dimensions
+      mWidth = loadedSurface->w;
+      mHeight = loadedSurface->h;
+    }
+  }
 
-	//Return success
-	return mTexture != nullptr;
+  //Return success
+  return mTexture != nullptr;
 }
 
 void LTexture::free()
